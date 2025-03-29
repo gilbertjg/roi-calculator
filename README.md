@@ -13,7 +13,9 @@ A clean, streamlined ROI calculator built with Streamlit — compare cash-on-cas
 ---
 
 ### 📸 Preview
-_Screenshot coming soon..._
+
+![ROI Calculator Screenshot](calculator_screenshot.jpg)
+
 
 ---
 
