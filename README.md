@@ -14,9 +14,7 @@ A professional-grade **Streamlit app** to compare **cash-on-cash returns** for L
 
 ### 📷 Preview
 
-![ROI Calculator Screenshot](notebooks/calculator%20screenshot.jpg)
-
-
+![ROI Calculator Screenshot](notebooks/calculator_screenshot.jpg)
 
 ---
 
