@@ -37,7 +37,8 @@ if not st.session_state["show_calculator"]:
             if success:
                 st.session_state["show_calculator"] = True
                 st.success("✅ Thanks! Launching the calculator now...")
-                st.experimental_rerun()
+                st.rerun()
+
         else:
             st.warning("Please enter both name & email to proceed.")
             st.stop()
