@@ -1,33 +1,37 @@
+import smtplib
+from email.mime.text import MIMEText
 
-import streamlit as st
-import pandas as pd
+# ... your other Streamlit code ...
 
-st.set_page_config(page_title="ROI Calculator", layout="centered")
+# --- Contact Form ---
+st.header("📬 Contact Before Using")
 
-# --- Contact Capture Gate ---
-if "contact_entered" not in st.session_state:
-    st.session_state.contact_entered = False
+with st.form("contact_form"):
+    name = st.text_input("Name")
+    email = st.text_input("Email")
+    phone = st.text_input("Phone")
+    submitted = st.form_submit_button("Submit & Continue")
 
-if not st.session_state.contact_entered:
-    st.markdown("## 🏡 ROI Calculator Access")
-    st.markdown("Enter your contact info to access the calculator:")
+if submitted:
+    if name and email and phone:
+        st.success("Thanks! Launching calculator...")
+        
+        # Compose message
+        msg = MIMEText(f"Name: {name}\nEmail: {email}\nPhone: {phone}")
+        msg["Subject"] = "New ROI Calculator Lead"
+        msg["From"] = "your_email@example.com"  # Replace with Gmail or your domain email
+        msg["To"] = "0bser4c4@robot.zapier.com"  # Zapier Email Parser
 
-    with st.form("contact_form"):
-        name = st.text_input("Name")
-        email = st.text_input("Email")
-        phone = st.text_input("Phone Number (optional)")
+        # Send the email
+        try:
+            with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+                server.login("your_email@example.com", "your_app_password")  # Use app password
+                server.send_message(msg)
+        except Exception as e:
+            st.error(f"Failed to send info to CRM: {e}")
+    else:
+        st.warning("Please fill out all fields before continuing.")
 
-        submitted = st.form_submit_button("Enter")
-
-        if submitted and name and email:
-            # Save contact info
-            df = pd.DataFrame([[name, email, phone]], columns=["Name", "Email", "Phone"])
-            df.to_csv("contacts.csv", mode="a", header=not pd.read_csv("contacts.csv").empty if "contacts.csv" in os.listdir() else True, index=False)
-
-            st.session_state.contact_entered = True
-            st.success("Access granted! Welcome, " + name.split()[0] + " 👋")
-
-    st.stop()
 
 
 # --- Title ---
