@@ -1,37 +1,41 @@
 import smtplib
 from email.mime.text import MIMEText
-
-# ... your other Streamlit code ...
+import streamlit as st
 
 # --- Contact Form ---
-st.header("📬 Contact Before Using")
+st.header("📬 Contact Info to Access the Calculator")
 
 with st.form("contact_form"):
     name = st.text_input("Name")
     email = st.text_input("Email")
-    phone = st.text_input("Phone")
-    submitted = st.form_submit_button("Submit & Continue")
+    phone = st.text_input("Phone Number (optional)")
+    submitted = st.form_submit_button("Enter")
+
+def send_email_to_zapier(name, email, phone):
+    try:
+        msg = MIMEText(f"Name: {name}\nEmail: {email}\nPhone: {phone or 'N/A'}")
+        msg["Subject"] = "New ROI Calculator Lead"
+        msg["From"] = "gilbertjrealtor@gmail.com"  # 👈 Use the email linked to your app password
+        msg["To"] = "0bser4c4@robot.zapier.com"
+
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login("gilbertjrealtor@gmail.com", "hlaxsolttsziezyk")  # 👈 Use your real Gmail app password
+            server.send_message(msg)
+        return True
+    except Exception as e:
+        st.error(f"⚠️ Error sending lead to CRM: {e}")
+        return False
 
 if submitted:
-    if name and email and phone:
-        st.success("Thanks! Launching calculator...")
-        
-        # Compose message
-        msg = MIMEText(f"Name: {name}\nEmail: {email}\nPhone: {phone}")
-        msg["Subject"] = "New ROI Calculator Lead"
-        msg["From"] = "your_email@example.com"  # Replace with Gmail or your domain email
-        msg["To"] = "0bser4c4@robot.zapier.com"  # Zapier Email Parser
-
-        # Send the email
-        try:
-            with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-                server.login("your_email@example.com", "your_app_password")  # Use app password
-                server.send_message(msg)
-        except Exception as e:
-            st.error(f"Failed to send info to CRM: {e}")
+    if name and email:
+        success = send_email_to_zapier(name, email, phone)
+        if success:
+            st.success("✅ Thanks! Launching calculator...")
+        else:
+            st.stop()
     else:
-        st.warning("Please fill out all fields before continuing.")
-
+        st.warning("Please enter both name & email to proceed.")
+        st.stop()
 
 
 # --- Title ---
