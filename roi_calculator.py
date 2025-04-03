@@ -15,11 +15,11 @@ def send_email_to_zapier(name, email, phone):
     try:
         msg = MIMEText(f"Name: {name}\nEmail: {email}\nPhone: {phone or 'N/A'}")
         msg["Subject"] = "New ROI Calculator Lead"
-        msg["From"] = "gilbertjrealtor@gmail.com"  # 👈 Use the email linked to your app password
+        msg["From"] = "gilbertjrealtor@gmail.com"
         msg["To"] = "0bser4c4@robot.zapier.com"
 
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-            server.login("gilbertjrealtor@gmail.com", "hlaxsolttsziezyk")  # 👈 Use your real Gmail app password
+            server.login("gilbertjrealtor@gmail.com", "hlaxsolttsziezyk")
             server.send_message(msg)
         return True
     except Exception as e:
@@ -30,12 +30,20 @@ if submitted:
     if name and email:
         success = send_email_to_zapier(name, email, phone)
         if success:
-            st.success("✅ Thanks! Launching calculator...")
+            st.success("✅ Thanks! Launching the calculator now...")
         else:
             st.stop()
     else:
         st.warning("Please enter both name & email to proceed.")
         st.stop()
+
+
+# --- Show Calculator Only If Allowed ---
+if st.session_state.show_calculator:
+    st.header("🏡 Real Estate Cash-on-Cash ROI Calculator")
+    st.caption("Compare Long-Term vs Short-Term Rental Performance")
+    # your full calculator logic here
+
 
 
 # --- Title ---
