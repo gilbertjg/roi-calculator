@@ -1,5 +1,30 @@
 
 import streamlit as st
+import pandas as pd
+
+st.set_page_config(page_title="ROI Calculator", layout="centered")
+
+# --- Email Capture Gate ---
+if "email_entered" not in st.session_state:
+    st.session_state.email_entered = False
+
+if not st.session_state.email_entered:
+    st.markdown("## 🏡 ROI Calculator")
+    st.markdown("Please enter your email to access the app:")
+
+    with st.form("email_form"):
+        user_email = st.text_input("Email", placeholder="you@example.com")
+        submitted = st.form_submit_button("Enter")
+
+        if submitted and user_email:
+            # Save to CSV (or forward to CRM/Zapier later)
+            df = pd.DataFrame([[user_email]], columns=["email"])
+            df.to_csv("leads.csv", mode="a", header=False, index=False)
+
+            st.session_state.email_entered = True
+            st.success("Access granted! 🎯")
+
+    st.stop()  # 🚨 Prevent rest of the app from loading until email is submitted
 
 # --- Title ---
 st.title("🏡 Real Estate Cash-on-Cash ROI Calculator")
