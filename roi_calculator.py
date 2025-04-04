@@ -3,13 +3,23 @@ from email.mime.text import MIMEText
 import streamlit as st
 
 # --- Initialize session state ---
-query_params = st.experimental_get_query_params()
+query_params = st.query_params  # ✅ modern method
 
+# Show calculator if "access=true" in URL
 if "show_calculator" not in st.session_state:
-    st.session_state["show_calculator"] = query_params.get("access", [""])[0] == "true"
+    st.session_state["show_calculator"] = query_params.get("access", "") == "true"
 
+# Restore user_info from query params if available
 if "user_info" not in st.session_state:
-    st.session_state["user_info"] = {}
+    if "name" in query_params and "email" in query_params:
+        st.session_state["user_info"] = {
+            "name": query_params.get("name", ""),
+            "email": query_params.get("email", ""),
+            "phone": query_params.get("phone", "")
+        }
+    else:
+        st.session_state["user_info"] = {}
+
 
 # --- Contact Form ---
 if not st.session_state["show_calculator"] and not st.session_state["user_info"]:
