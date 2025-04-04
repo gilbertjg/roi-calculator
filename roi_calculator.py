@@ -6,8 +6,11 @@ import streamlit as st
 if "show_calculator" not in st.session_state:
     st.session_state["show_calculator"] = False
 
+if "user_info" not in st.session_state:
+    st.session_state["user_info"] = {}
+
 # --- Contact Form ---
-if not st.session_state["show_calculator"]:
+if not st.session_state["show_calculator"] and not st.session_state["user_info"]:
     st.header("📬 Contact Info to Access the Calculator")
 
     with st.form("contact_form"):
@@ -49,6 +52,7 @@ if not st.session_state["show_calculator"]:
         if name and email:
             success = send_email_to_zapier(name, email, phone)
             if success:
+                st.session_state["user_info"] = {"name": name, "email": email, "phone": phone}
                 st.session_state["show_calculator"] = True
                 st.success("✅ Thanks! Launching the calculator now...")
                 st.rerun()
@@ -56,9 +60,8 @@ if not st.session_state["show_calculator"]:
             st.warning("Please enter both name & email to proceed.")
             st.stop()
 
-
 # --- Main Calculator ---
-if st.session_state["show_calculator"]:
+if st.session_state["show_calculator"] or st.session_state["user_info"]:
     st.title("🏡 Real Estate Cash-on-Cash ROI Calculator")
     st.caption("Compare Long-Term vs Short-Term Rental Performance")
 
@@ -136,3 +139,9 @@ if st.session_state["show_calculator"]:
         """,
         unsafe_allow_html=True
     )
+
+    # Optional: Reset button to clear session
+    if st.button("🔄 Reset Contact Info"):
+        st.session_state.user_info = {}
+        st.session_state.show_calculator = False
+        st.rerun()
