@@ -3,42 +3,38 @@ from email.mime.text import MIMEText
 import streamlit as st
 
 # --- Initialize session state ---
-query_params = st.query_params  # ✅ modern method
+query_params = st.query_params
 
-# Show calculator if "access=true" in URL
-if "show_calculator" not in st.session_state:
-    st.session_state["show_calculator"] = query_params.get("access", "") == "true"
-
-# Restore user_info from query params if available
 if "user_info" not in st.session_state:
-    if "name" in query_params and "email" in query_params:
-        st.session_state["user_info"] = {
-            "name": query_params.get("name", ""),
-            "email": query_params.get("email", ""),
-            "phone": query_params.get("phone", "")
-        }
-    else:
-        st.session_state["user_info"] = {}
+    st.session_state["user_info"] = {
+        "name": query_params.get("name", [""])[0],
+        "email": query_params.get("email", [""])[0],
+        "phone": query_params.get("phone", [""])[0],
+    }
 
+if "show_calculator" not in st.session_state:
+    st.session_state["show_calculator"] = (
+        query_params.get("access", [""])[0] == "true"
+        and st.session_state["user_info"]["name"]
+        and st.session_state["user_info"]["email"]
+    )
 
 # --- Contact Form ---
-if not st.session_state["show_calculator"] and not st.session_state["user_info"]:
+if not st.session_state["show_calculator"]:
     st.header("📬 Contact Info to Access the Calculator")
 
     with st.form("contact_form"):
-        name = st.text_input("Name")
-        email = st.text_input("Email")
-        phone = st.text_input("Phone Number (optional)")
+        name = st.text_input("Name", value=st.session_state["user_info"].get("name", ""))
+        email = st.text_input("Email", value=st.session_state["user_info"].get("email", ""))
+        phone = st.text_input("Phone Number (optional)", value=st.session_state["user_info"].get("phone", ""))
         submitted = st.form_submit_button("Enter")
 
     def send_email_to_zapier(name, email, phone):
         try:
-            # Split full name into first and last
             parts = name.strip().split(" ", 1)
             first_name = parts[0]
             last_name = parts[1] if len(parts) > 1 else ""
 
-            # Format email body to match Zapier template
             message = (
                 f"New ROI Calculator Lead\n"
                 f"Name: {first_name} {last_name}\n"
@@ -55,7 +51,6 @@ if not st.session_state["show_calculator"] and not st.session_state["user_info"]
                 server.login("gilbertjrealtor@gmail.com", "hlaxsolttsziezyk")
                 server.send_message(msg)
             return True
-
         except Exception as e:
             st.error(f"⚠️ Error sending lead to CRM: {e}")
             return False
@@ -66,12 +61,18 @@ if not st.session_state["show_calculator"] and not st.session_state["user_info"]
             if success:
                 st.session_state["user_info"] = {"name": name, "email": email, "phone": phone}
                 st.session_state["show_calculator"] = True
-                st.experimental_set_query_params(access="true")
+                st.experimental_set_query_params(
+                    access="true",
+                    name=name,
+                    email=email,
+                    phone=phone
+                )
                 st.success("✅ Thanks! Launching the calculator now...")
                 st.rerun()
         else:
             st.warning("Please enter both name & email to proceed.")
             st.stop()
+
 
 # --- Main Calculator ---
 if st.session_state["show_calculator"] or st.session_state["user_info"]:
