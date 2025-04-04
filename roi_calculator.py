@@ -1,26 +1,25 @@
+import streamlit as st
 import smtplib
 from email.mime.text import MIMEText
-import streamlit as st
 
-# --- Initialize session state ---
+# --- Safe Query Param Retrieval ---
 query_params = st.experimental_get_query_params()
 
-# Always initialize first
+# --- Always initialize session state ---
 if "show_calculator" not in st.session_state:
     st.session_state["show_calculator"] = False
 
 if "user_info" not in st.session_state:
     st.session_state["user_info"] = {}
 
-# Load from query params if present
+# --- Inject from query params if fresh visit ---
 if not st.session_state["user_info"] and query_params.get("name") and query_params.get("email"):
     st.session_state["user_info"] = {
         "name": query_params.get("name", [""])[0],
         "email": query_params.get("email", [""])[0],
-        "phone": query_params.get("phone", [""])[0],
+        "phone": query_params.get("phone", [""])[0]
     }
 
-# Access flag override
 if query_params.get("access", [""])[0] == "true":
     st.session_state["show_calculator"] = True
 
