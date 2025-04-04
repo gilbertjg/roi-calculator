@@ -2,26 +2,26 @@ import streamlit as st
 import smtplib
 from email.mime.text import MIMEText
 
-# --- Get query params safely ---
-query_params = st.experimental_get_query_params()
+query_params = st.query_params  # use non-deprecated version
 
-# --- Safe initialize session state ---
-if "show_calculator" not in st.session_state:
-    st.session_state["show_calculator"] = False
-
+# Ensure user_info is created from URL if missing
 if "user_info" not in st.session_state:
     st.session_state["user_info"] = {}
 
-# --- Populate from query params if available ---
 if not st.session_state["user_info"] and query_params.get("name") and query_params.get("email"):
     st.session_state["user_info"] = {
         "name": query_params.get("name", [""])[0],
         "email": query_params.get("email", [""])[0],
-        "phone": query_params.get("phone", [""])[0],
+        "phone": query_params.get("phone", [""])[0] if query_params.get("phone") else ""
     }
 
-if query_params.get("access", [""])[0] == "true" and st.session_state["user_info"].get("name") and st.session_state["user_info"].get("email"):
-    st.session_state["show_calculator"] = True
+# Now decide if we should show the calculator
+if "show_calculator" not in st.session_state:
+    st.session_state["show_calculator"] = (
+        query_params.get("access", [""])[0] == "true"
+        and st.session_state["user_info"].get("name")
+        and st.session_state["user_info"].get("email")
+    )
 
 
 # --- Contact Form ---
