@@ -3,11 +3,10 @@ from email.mime.text import MIMEText
 import streamlit as st
 
 # --- Initialize session state ---
-query_params = st.query_params
+query_params = st.experimental_get_query_params()
 
 if "show_calculator" not in st.session_state:
     st.session_state["show_calculator"] = query_params.get("access", [""])[0] == "true"
-
 
 if "user_info" not in st.session_state:
     st.session_state["user_info"] = {}
