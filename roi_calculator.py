@@ -7,35 +7,41 @@ if "show_calculator" not in st.session_state:
     st.session_state["show_calculator"] = False
 
 # --- Contact Form ---
-def send_email_to_zapier(name, email, phone):
-    try:
-        # Split full name into first and last
-        parts = name.strip().split(" ", 1)
-        first_name = parts[0]
-        last_name = parts[1] if len(parts) > 1 else ""
+if not st.session_state["show_calculator"]:
+    st.header("📬 Contact Info to Access the Calculator")
 
-        # This format matches your parser template
-        message = (
-            f"New ROI Calculator Lead\n"
-            f"Name: {first_name} {last_name}\n"
-            f"Email: {email}\n"
-            f"Phone: {phone or 'N/A'}"
-        )
+    with st.form("contact_form"):
+        name = st.text_input("Name")
+        email = st.text_input("Email")
+        phone = st.text_input("Phone Number (optional)")
+        submitted = st.form_submit_button("Enter")
 
-        msg = MIMEText(message)
-        msg["Subject"] = "New ROI Calculator Lead"
-        msg["From"] = "gilbertjrealtor@gmail.com"
-        msg["To"] = "r3vxhw4r@robot.zapier.com"
+    def send_email_to_zapier(name, email, phone):
+        try:
+            msg = MIMEText(f"Name: {name}\nEmail: {email}\nPhone: {phone or 'N/A'}")
+            msg["Subject"] = "New ROI Calculator Lead"
+            msg["From"] = "gilbertjrealtor@gmail.com"
+            msg["To"] = "r3vxhw4r@robot.zapier.com"
 
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-            server.login("gilbertjrealtor@gmail.com", "hlaxsolttsziezyk")
-            server.send_message(msg)
-        return True
+            with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+                server.login("gilbertjrealtor@gmail.com", "hlaxsolttsziezyk")
+                server.send_message(msg)
+            return True
+        except Exception as e:
+            st.error(f"⚠️ Error sending lead to CRM: {e}")
+            return False
 
-    except Exception as e:
-        st.error(f"⚠️ Error sending lead to CRM: {e}")
-        return False
+    if submitted:
+        if name and email:
+            success = send_email_to_zapier(name, email, phone)
+            if success:
+                st.session_state["show_calculator"] = True
+                st.success("✅ Thanks! Launching the calculator now...")
+                st.rerun()
 
+        else:
+            st.warning("Please enter both name & email to proceed.")
+            st.stop()
 
 # --- Main Calculator ---
 if st.session_state["show_calculator"]:
