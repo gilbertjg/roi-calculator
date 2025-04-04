@@ -12,12 +12,10 @@ if "user_info" not in st.session_state:
         "phone": query_params.get("phone", [""])[0],
     }
 
-if "show_calculator" not in st.session_state:
-    st.session_state["show_calculator"] = (
-        query_params.get("access", [""])[0] == "true"
-        and st.session_state["user_info"]["name"]
-        and st.session_state["user_info"]["email"]
-    )
+# ✅ Safely set show_calculator only if access=true and name & email are provided
+if query_params.get("access", [""])[0] == "true" and st.session_state["user_info"]["name"] and st.session_state["user_info"]["email"]:
+    st.session_state["show_calculator"] = True
+
 
 # --- Contact Form ---
 if not st.session_state["show_calculator"]:
