@@ -21,7 +21,7 @@ if not st.session_state["show_calculator"]:
             msg = MIMEText(f"Name: {name}\nEmail: {email}\nPhone: {phone or 'N/A'}")
             msg["Subject"] = "New ROI Calculator Lead"
             msg["From"] = "gilbertjrealtor@gmail.com"
-            msg["To"] = "0bser4c4@robot.zapier.com"
+            msg["To"] = "r3vxhw4r@robot.zapier.com"
 
             with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
                 server.login("gilbertjrealtor@gmail.com", "hlaxsolttsziezyk")
