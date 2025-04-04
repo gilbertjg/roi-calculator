@@ -18,7 +18,20 @@ if not st.session_state["show_calculator"]:
 
     def send_email_to_zapier(name, email, phone):
         try:
-            msg = MIMEText(f"Name: {name}\nEmail: {email}\nPhone: {phone or 'N/A'}")
+            # Split full name into first and last
+            parts = name.strip().split(" ", 1)
+            first_name = parts[0]
+            last_name = parts[1] if len(parts) > 1 else ""
+
+            # Format email body to match Zapier template
+            message = (
+                f"New ROI Calculator Lead\n"
+                f"Name: {first_name} {last_name}\n"
+                f"Email: {email}\n"
+                f"Phone: {phone or 'N/A'}"
+            )
+
+            msg = MIMEText(message)
             msg["Subject"] = "New ROI Calculator Lead"
             msg["From"] = "gilbertjrealtor@gmail.com"
             msg["To"] = "r3vxhw4r@robot.zapier.com"
@@ -27,6 +40,7 @@ if not st.session_state["show_calculator"]:
                 server.login("gilbertjrealtor@gmail.com", "hlaxsolttsziezyk")
                 server.send_message(msg)
             return True
+
         except Exception as e:
             st.error(f"⚠️ Error sending lead to CRM: {e}")
             return False
@@ -38,10 +52,10 @@ if not st.session_state["show_calculator"]:
                 st.session_state["show_calculator"] = True
                 st.success("✅ Thanks! Launching the calculator now...")
                 st.rerun()
-
         else:
             st.warning("Please enter both name & email to proceed.")
             st.stop()
+
 
 # --- Main Calculator ---
 if st.session_state["show_calculator"]:
