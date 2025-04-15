@@ -3,7 +3,7 @@ import smtplib
 from email.mime.text import MIMEText
 
 # --- Read Query Params ---
-query_params = st.query_params
+query_params = st.experimental_get_query_params()
 
 # --- Initialize Session State ---
 if "user_info" not in st.session_state:
