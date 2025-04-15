@@ -2,27 +2,24 @@ import streamlit as st
 import smtplib
 from email.mime.text import MIMEText
 
-query_params = st.query_params  # use non-deprecated version
+# --- Read Query Params ---
+query_params = st.query_params
 
-# Ensure user_info is created from URL if missing
+# --- Initialize Session State ---
 if "user_info" not in st.session_state:
     st.session_state["user_info"] = {}
 
+if "show_calculator" not in st.session_state:
+    st.session_state["show_calculator"] = False
+
+# --- Populate from URL if available ---
 if not st.session_state["user_info"] and query_params.get("name") and query_params.get("email"):
     st.session_state["user_info"] = {
         "name": query_params.get("name", [""])[0],
         "email": query_params.get("email", [""])[0],
         "phone": query_params.get("phone", [""])[0] if query_params.get("phone") else ""
     }
-
-# Now decide if we should show the calculator
-if "show_calculator" not in st.session_state:
-    st.session_state["show_calculator"] = (
-        query_params.get("access", [""])[0] == "true"
-        and st.session_state["user_info"].get("name")
-        and st.session_state["user_info"].get("email")
-    )
-
+    st.session_state["show_calculator"] = query_params.get("access", [""])[0] == "true"
 
 # --- Contact Form ---
 if not st.session_state["show_calculator"]:
@@ -61,7 +58,7 @@ if not st.session_state["show_calculator"]:
             return False
 
     if submitted:
-        if name and email:
+        if len(name) > 1 and "@" in email:
             success = send_email_to_zapier(name, email, phone)
             if success:
                 st.session_state["user_info"] = {"name": name, "email": email, "phone": phone}
@@ -75,8 +72,9 @@ if not st.session_state["show_calculator"]:
                 st.success("✅ Thanks! Launching the calculator now...")
                 st.rerun()
         else:
-            st.warning("Please enter both name & email to proceed.")
+            st.warning("Please enter a valid name and email.")
             st.stop()
+
 
 
 # --- Main Calculator ---
