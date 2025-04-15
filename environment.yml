@@ -1,8 +1,0 @@
-name: cameron_county_market_trends
-channels:
-  - defaults
-dependencies:
-  - python=3.10
-  - ipykernel
-  - notebook
-prefix: C:\Users\ekwit\anaconda3\envs\cameron_county_market_trends
